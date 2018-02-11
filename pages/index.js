@@ -3,50 +3,73 @@ import fetch from 'isomorphic-unfetch'
 import qs from 'query-string'
 import moment from 'moment-immutable'
 
+import request from '../utils/api/request'
+import Layout from '../components/Layout'
+
 const PACE_THRESHOLD = (12 * 60)
 
 function humanReadablePace (time) {
   const hours = Math.floor(time / 3600);
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time - minutes * 60);
+  let minutes = Math.floor(time / 60);
+  let seconds = Math.floor(time - minutes * 60);
+  if (minutes < 10) minutes = `0${minutes}`
+  if (seconds < 10) seconds = `0${seconds}`
   return `${hours ? `${hours}:` : ''}${minutes}:${seconds}`
 }
 
 function roundOff (num) {
-  return Math.round(num * 100) / 100
+  return (Math.round(num * 100) / 100).toFixed(2)
+}
+
+function parseActivities (activities) {
+  activities = activities
+    .filter(a => a.pace < PACE_THRESHOLD)
+    .map(a => {
+      a.startTime = moment(a.startTime).format('MM-DD-YYYY, h:mm a')
+      return a
+    })
+
+  const paces = activities
+    .map(a => a.pace)
+    .reduce((total, pace) => total += pace, 0)
+  const distance = activities
+    .reduce((total, { distance = 0, pace }) => {
+      if (pace < PACE_THRESHOLD) total += distance
+      return total
+    }, 0)
+
+  const averagePace = humanReadablePace(paces / activities.length)
+  return {
+    activities,
+    averagePace,
+    distance: roundOff(distance),
+  }
 }
 
 export default class Index extends React.Component {
   static async getInitialProps ({ req }) {
     const baseUrl = req ? `${req.protocol}://${req.get('Host')}` : '';
-    let token
-    if (req) {
-      token = req.cookies.token
-    } else {
-      token = localStorage.getItem('token');
-    }
-    console.log('>>>', token)
-    let activities = await fetch(`${baseUrl}/api/activity?${qs.stringify({ afterDate: '2018-02-01'})}`, {
-      headers: {
-        authorization: `Bearer ${token}`
-      }
+    const afterDate = moment().startOf('month').format('YYYY-MM-DD');
+
+    let activities = await request('/activity', {
+      req,
+      params: {
+        afterDate,
+      },
     })
-    activities = await activities.json()
-    const today = new Date();
     return {
-      activities,
-      afterDate: `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`
+      afterDate,
+      ...parseActivities(activities),
     };
   }
 
   constructor (props) {
-    super();
-    this.onSubmit = this.onSubmit.bind(this)
+    super(props)
     this.state = {
-      afterDate: props.afterDate,
-      activities: props.activities,
+      ...props
     }
   }
+
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
@@ -54,47 +77,25 @@ export default class Index extends React.Component {
   }
 
   getActivities = async () => {
-    const token = localStorage.getItem('token');
-
-    let activities = await fetch(`http://localhost:3000/api/activity?${qs.stringify({ afterDate: this.state.afterDate})}`, {
-      headers: {
-        authorization: `Bearer ${token}`
-      }
+    const activities = await request('/activity', {
+      params: {
+        afterDate: this.state.afterDate,
+      },
     })
-    activities = await activities.json()
-    activities = activities
-      .filter(a => a.pace < PACE_THRESHOLD)
-      .map(a => {
-        a.startTime = moment(a.startTime).format('MM-DD-YYYY, h:mm a')
-        return a
-      })
 
-    const paces = activities
-      .map(a => a.pace)
-      .reduce((total, pace) => total += pace, 0)
-    const distance = activities
-      .reduce((total, { distance = 0, pace }) => {
-        if (pace < PACE_THRESHOLD) total += distance
-        return total
-      }, 0)
-
-    const averagePace = humanReadablePace(paces / activities.length)
     this.setState({
-      activities,
-      distance: roundOff(distance),
-      averagePace
+      ...parseActivities(activities),
     })
   }
 
-  onSubmit (e) {
+  onSubmit = (e) => {
     e.preventDefault()
     this.getActivities();
   }
 
   render () {
     return (
-      <div>
-        {}
+      <Layout title="Dashboard">
         <form onSubmit={this.onSubmit}>
           <input onChange={this.handleChange} value={this.state.afterDate} name="afterDate" />
           <button type="submit">Submit</button>
@@ -109,7 +110,6 @@ export default class Index extends React.Component {
           </thead>
           <tbody>
             {this.state.activities
-              .filter(activity => activity.activityName === 'Run' && activity.pace < PACE_THRESHOLD)
               .map(a => (
                 <tr key={a.logId}>
                   <td>{a.startTime}</td>
@@ -126,7 +126,7 @@ export default class Index extends React.Component {
             </tr>
           </tfoot>
         </table>
-      </div>
+      </Layout>
     )
   }
 }

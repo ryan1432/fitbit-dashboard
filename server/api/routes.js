@@ -48,7 +48,7 @@ router.get('/activity', (req, res) => {
       },
     }, (err, response) => {
       if (err) {
-        return res.status(500).json(JSON.parse(err))
+        return res.status(500).json(response.body)
       }
       const body = JSON.parse(response.body)
       activities.value = body.activities
