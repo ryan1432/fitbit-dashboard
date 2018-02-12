@@ -4,6 +4,7 @@ import qs from 'query-string'
 import moment from 'moment-immutable'
 import numeral from 'numeral'
 import { DateRange } from 'react-date-range';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
 
 import ClickBoundary from '../components/helpers/ClickOutside'
 import request from '../utils/api/request'
@@ -40,6 +41,7 @@ function parseActivities (activities) {
     .filter(a => a.pace < PACE_THRESHOLD)
     .map(a => {
       a.timestamp = moment(a.startTime).format('MM-DD-YYYY, h:mm a')
+      a.minutePace = (a.pace / 60).toFixed(2)
       return a
     })
 
@@ -59,11 +61,13 @@ function parseActivities (activities) {
       return total += steps
     }, 0)
 
-  const averagePace = humanReadablePace(paces / activities.length)
+  const averagePaceDec = paces / activities.length
+  const averagePace = humanReadablePace(averagePaceDec)
   const averageHeartRate = roundOff(heartRates / activities.length)
   return {
     activities,
     averagePace,
+    averagePaceDec,
     averageHeartRate,
     steps: numeral(steps).format('0,0'),
     distance: roundOff(distance),
@@ -104,6 +108,8 @@ export default class Index extends React.Component {
   }
 
   handleSelect = ({ startDate, endDate }) => {
+    console.log(endDate)
+    if (!endDate) return
     this.setState({
       afterDate: startDate.format('YYYY-MM-DD'),
       beforeDate: endDate.format('YYYY-MM-DD')
@@ -145,7 +151,13 @@ export default class Index extends React.Component {
       beforeDate,
       afterDate,
     } = this.state
-
+    const chartdata = activities.sort((a, b) => {
+      const aMoment = moment(a.startTime)
+      const bMoment = moment(b.startTime)
+      if (aMoment.isBefore(bMoment)) return -1;
+      if (aMoment.isAfter(bMoment)) return 1;
+      return 0;
+    })
     const header = (
       <form onSubmit={this.onSubmit} className="container form">
         <label>Date range:</label>
@@ -193,6 +205,9 @@ export default class Index extends React.Component {
             top: 100%;
             position: absolute;
             right: 0;
+            box-shadow: 0 4px 4px -1px ${colors.grey};
+            border-radius: 2px;
+            z-index: 1;
           }
           .form {
             display: flex;
@@ -233,37 +248,66 @@ export default class Index extends React.Component {
         </Tiles>
         <Tiles>
           <Tile>
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Distance</th>
-                  <th>Pace</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.state.activities
-                  .map(a => (
-                    <tr key={a.logId}>
-                      <td>{a.timestamp}</td>
-                      <td>{roundOff(a.distance)}<span className="suffix">miles</span></td>
-                      <td>{humanReadablePace(a.pace)}<span className="suffix">/ mile</span></td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Distance</th>
+                    <th>Pace</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.state.activities
+                    .map(a => (
+                      <tr key={a.logId}>
+                        <td>{a.timestamp}</td>
+                        <td>{roundOff(a.distance)}<span className="suffix">miles</span></td>
+                        <td>{humanReadablePace(a.pace)}<span className="suffix">/ mile</span></td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           </Tile>
-          {selectedActivity &&
-            <Tile title="Compare your runs">
-              (chart)
-            </Tile>
-          }
+          <Tile title="Compare your runs">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={chartdata.map(a => { a.date = moment(a.startTime).format('M/D/YY'); return a })} width={600} height={300}>
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <ReferenceLine y={this.state.averagePaceDec / 60} stroke={colors.orange} isFront strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="1 6"/>
+                  <Line type="monotone" dataKey="minutePace" stroke={colors.green} strokeWidth={2} />
+                  <Line type="monotone" dataKey="distance" stroke={colors.blue} strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+          </Tile>
         </Tiles>
         <style jsx>{`
           .suffix {
             color: ${colors.grey}
             font-size: ${typography.text.small}
             padding-left: ${spacing.small}
+          }
+          .table-container {
+            max-height: 360px;
+            overflow:auto;
+          }
+          .table-container table {
+            width: calc(100% - ${spacing.small})
+          }
+          ::-webkit-scrollbar {
+            width: ${spacing.small};
+          }
+
+          ::-webkit-scrollbar-track {
+            background: transparent;
+          }
+
+          ::-webkit-scrollbar-thumb {
+            background ${colors.grey};
+            border-radius: 12px;
           }
         `}</style>
       </Layout>
