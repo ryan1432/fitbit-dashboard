@@ -38,7 +38,7 @@ export default ({ header, children, title = 'Next.js / Express App' }) => (
         margin: 0;
       }
       header {
-        padding: ${spacing.large};
+        padding: ${spacing.small};
         background: ${colors.grey};
         margin-bottom: ${spacing.large};
       }

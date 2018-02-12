@@ -13,6 +13,8 @@ import Title from '../components/atoms/Title'
 import Tiles from '../components/atoms/Tiles'
 import Tile from '../components/atoms/Tile'
 
+import withUser from '../components/User'
+
 import colors from '../styles/colors'
 import spacing from '../styles/spacing'
 import typography from '../styles/typography'
@@ -74,7 +76,7 @@ function parseActivities (activities) {
   }
 }
 
-export default class Index extends React.Component {
+export class Index extends React.Component {
   static async getInitialProps ({ req }) {
     const baseUrl = req ? `${req.protocol}://${req.get('Host')}` : '';
     const afterDate = moment().startOf('month').format('YYYY-MM-DD');
@@ -108,7 +110,6 @@ export default class Index extends React.Component {
   }
 
   handleSelect = ({ startDate, endDate }) => {
-    console.log(endDate)
     if (!endDate) return
     this.setState({
       afterDate: startDate.format('YYYY-MM-DD'),
@@ -151,6 +152,7 @@ export default class Index extends React.Component {
       beforeDate,
       afterDate,
     } = this.state
+    const { user } = this.props
     const chartdata = activities.sort((a, b) => {
       const aMoment = moment(a.startTime)
       const bMoment = moment(b.startTime)
@@ -160,46 +162,67 @@ export default class Index extends React.Component {
     })
     const header = (
       <form onSubmit={this.onSubmit} className="container form">
-        <label>Date range:</label>
-        <ClickBoundary onClickOutside={() => {
-          if (this.state.calendarOpen) this.toggleCalendar(false)
-        }}>
-          <Fragment>
-            <span
-              className="datepicker-input"
-              onClick={() => this.toggleCalendar(!this.state.calendarOpen)}
-            >
-              <span>{`${moment(afterDate, 'YYYY-MM-DD').format('MMMM D, Y')} to ${moment(beforeDate, 'YYYY-MM-DD').format('MMMM D, Y')}`}</span>
-              <Calendar className="icon--small icon--text-color"/>
-            </span>
-            {this.state.calendarOpen &&
-              <div className="datepicker" onClick={e => e.stopPropagation()}>
-                <DateRange
-                  startDate={moment(this.state.afterDate, 'YYYY-MM-DD')}
-                  endDate={moment(this.state.beforeDate, 'YYYY-MM-DD')}
-                  maxDate={moment().startOf('day')}
-                  minDate={moment().subtract(1, 'year')}
-        					onInit={this.handleSelect}
-        					onChange={this.handleSelect}
-        				/>
-              </div>
-            }
-          </Fragment>
-        </ClickBoundary>
+        <div className="avatar">
+          <img src={user.avatar} />
+          Heya, {user.firstName}!
+        </div>
+        <div className="datepicker-container">
+          <label>Date range:</label>
+          <ClickBoundary onClickOutside={() => {
+            if (this.state.calendarOpen) this.toggleCalendar(false)
+          }}>
+            <Fragment>
+              <span
+                className="datepicker-input"
+                onClick={() => this.toggleCalendar(!this.state.calendarOpen)}
+              >
+                <span>{`${moment(afterDate, 'YYYY-MM-DD').format('MMMM D, Y')} to ${moment(beforeDate, 'YYYY-MM-DD').format('MMMM D, Y')}`}</span>
+                <Calendar className="icon--small icon--text-color"/>
+              </span>
+              {this.state.calendarOpen &&
+                <div className="datepicker" onClick={e => e.stopPropagation()}>
+                  <DateRange
+                    startDate={moment(this.state.afterDate, 'YYYY-MM-DD')}
+                    endDate={moment(this.state.beforeDate, 'YYYY-MM-DD')}
+                    maxDate={moment().startOf('day')}
+                    minDate={moment().subtract(1, 'year')}
+          					onInit={this.handleSelect}
+          					onChange={this.handleSelect}
+          				/>
+                </div>
+              }
+            </Fragment>
+          </ClickBoundary>
+        </div>
+
         <style jsx>{`
           form {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+          .avatar {
+            display: flex;
+            align-items: center;
+          }
+          .avatar img {
+            overflow: hidden;
+            border-radius: 100px;
+            width: 50px;
+            height: 50px;
+            margin-right: ${spacing.small};
+          }
+          .datepicker-container {
+            display: flex;
             justify-content: flex-end;
             align-items: center
+            position: relative;
           }
           label {
             margin-right: ${spacing.small};
             color: ${colors.darkGrey};
             font-size: ${typography.text.small};
             text-transform: uppercase;
-          }
-          .form {
-            position: relative;
           }
           .datepicker {
             top: 100%;
@@ -208,10 +231,6 @@ export default class Index extends React.Component {
             box-shadow: 0 4px 4px -1px ${colors.grey};
             border-radius: 2px;
             z-index: 1;
-          }
-          .form {
-            display: flex;
-            justify-content: flex-end;
           }
           .datepicker-input {
             background: transparent;
@@ -318,3 +337,5 @@ export default class Index extends React.Component {
 Index.defaultProps = {
   activities: []
 }
+
+export default withUser(Index)

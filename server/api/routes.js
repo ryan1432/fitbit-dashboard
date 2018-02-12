@@ -69,4 +69,27 @@ router.get('/activity', (req, res) => {
   next()
 })
 
+router.get('/profile', (req, res) => {
+  const headers = {
+    Authorization: req.headers.authorization,
+    'Accept-Language': 'en_US',
+  }
+  if (!req.headers.authorization) {
+    return res.json([])
+  }
+  request.get({
+    url: `${FITBIT_API_URL}/user/-/profile.json`,
+    headers,
+  }, (err, response) => {
+    if (err || response.statusCode < 200 || response.statusCode >= 300) {
+      return res.status(response.statusCode).json(response.body)
+    }
+    const body = JSON.parse(response.body)
+    res.json(body.user)
+  })
+}, (err, res, next) => {
+  if (err) console.log('err!!!', err)
+  next()
+})
+
 module.exports = router
