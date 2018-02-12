@@ -2,9 +2,13 @@ import React, { Fragment } from 'react';
 import fetch from 'isomorphic-unfetch'
 import qs from 'query-string'
 import moment from 'moment-immutable'
+import numeral from 'numeral'
 
 import request from '../utils/api/request'
 import Layout from '../components/Layout'
+import Title from '../components/atoms/Title'
+import Tiles from '../components/atoms/Tiles'
+import Tile from '../components/atoms/Tile'
 
 const PACE_THRESHOLD = (12 * 60)
 
@@ -32,16 +36,26 @@ function parseActivities (activities) {
   const paces = activities
     .map(a => a.pace)
     .reduce((total, pace) => total += pace, 0)
+  const heartRates = activities
+    .map(a => a.averageHeartRate)
+    .reduce((total, hr) => total += hr, 0)
   const distance = activities
     .reduce((total, { distance = 0, pace }) => {
       if (pace < PACE_THRESHOLD) total += distance
       return total
     }, 0)
+  const steps = activities
+    .reduce((total, { steps = 0 }) => {
+      return total += steps
+    }, 0)
 
   const averagePace = humanReadablePace(paces / activities.length)
+  const averageHeartRate = roundOff(heartRates / activities.length)
   return {
     activities,
     averagePace,
+    averageHeartRate,
+    steps: numeral(steps).format('0,0'),
     distance: roundOff(distance),
   }
 }
@@ -94,12 +108,23 @@ export default class Index extends React.Component {
   }
 
   render () {
+    const { distance, averagePace, averageHeartRate, steps, activities } = this.state
+
+    const header = (
+      <form onSubmit={this.onSubmit} className="container">
+        <input type="text" onChange={this.handleChange} value={this.state.afterDate} name="afterDate" />
+      </form>
+    )
     return (
-      <Layout title="Dashboard">
-        <form onSubmit={this.onSubmit}>
-          <input onChange={this.handleChange} value={this.state.afterDate} name="afterDate" />
-          <button type="submit">Submit</button>
-        </form>
+      <Layout title="Dashboard" header={header}>
+        <Tiles>
+          <Tile title="Total activities" value={activities.length} />
+          <Tile title="Total distance" label="miles" value={distance} />
+          <Tile title="Average pace" label="/ mile" value={averagePace} />
+          <Tile title="Average heart rate" label="bpm" value={averageHeartRate} />
+          <Tile title="Total steps" value={steps} />
+        </Tiles>
+        <Title tag="h2">Your last <strong>5</strong> runs</Title>
         <table>
           <thead>
             <tr>
@@ -110,6 +135,7 @@ export default class Index extends React.Component {
           </thead>
           <tbody>
             {this.state.activities
+              .slice(0, 5)
               .map(a => (
                 <tr key={a.logId}>
                   <td>{a.startTime}</td>
@@ -118,13 +144,6 @@ export default class Index extends React.Component {
                 </tr>
               ))}
           </tbody>
-          <tfoot>
-            <tr>
-              <td></td>
-              <td>{this.state.distance}</td>
-              <td>{this.state.averagePace}</td>
-            </tr>
-          </tfoot>
         </table>
       </Layout>
     )
