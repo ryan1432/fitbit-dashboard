@@ -1,5 +1,3 @@
-import { Fragment } from 'react'
-import Link from 'next/link'
 import Head from 'next/head'
 
 import colors from '../styles/colors'
@@ -22,7 +20,7 @@ export default ({ header, children, title = 'Next.js / Express App' }) => (
       </div>
       <footer>
         <div className="container">
-          &copy; { new Date().getFullYear() } - @nickjvm
+          Created by <a href="https://github.com/nickjvm">@nickjvm</a>
         </div>
       </footer>
     </div>
@@ -50,19 +48,6 @@ export default ({ header, children, title = 'Next.js / Express App' }) => (
       h3 {
         font-size: ${typography.text.medium}
       }
-      form input[type="text"] {
-        background: transparent;
-        color: ${colors.text};
-        padding: ${spacing.small};
-        font-size: ${typography.text.small};
-        font-style: italic;
-        border: 0;
-        -webkit-font-smoothing: antialiased;
-      }
-      form input[type="text"]:focus {
-        outline: 0;
-        background: ${colors.fadedWhite};
-      }
       footer {
         background: ${colors.white};
         padding: ${spacing.large};
@@ -80,7 +65,7 @@ export default ({ header, children, title = 'Next.js / Express App' }) => (
       }
       .container {
         width: 100%;
-        max-width: 1280px;
+        max-width: 1024px;
         padding: 0 ${spacing.small};
         margin: auto;
       }
@@ -92,12 +77,14 @@ export default ({ header, children, title = 'Next.js / Express App' }) => (
       table {
         border-collapse: collapse;
         width: 100%;
-        margin-bottom: ${spacing.large}
       }
       td, th {
         padding: 15px 5px;
         border: 1px solid ${colors.border};
         border-width: 0 0 1px 0;
+      }
+      tr:last-child td {
+        border-bottom-width: 0;
       }
       th {
         text-align: left;
@@ -109,6 +96,19 @@ export default ({ header, children, title = 'Next.js / Express App' }) => (
       }
       tfoot td {
         border-width: 2px 0 0 0;
+      }
+      svg[class*=icon--]:not(:last-child) {
+        margin-right: ${spacing.small}
+      }
+      svg[class*=icon--]:not(:first-child) {
+        margin-left: ${spacing.small}
+      }
+      .icon--small {
+        width: 20px;
+        height: 20px;
+      }
+      .icon--text-color path {
+        fill: ${colors.text}
       }
     `}</style>
   </div>

@@ -1,16 +1,28 @@
+import { Fragment } from 'react'
+
 import colors from '../../styles/colors'
 import spacing from '../../styles/spacing'
 import typography from '../../styles/typography'
 
-export default function Tile ({ title, value, label }) {
+export default function Tile ({ title, value, label, children }) {
   return (
     <div className="tile--container">
       <div className="tile">
-        <h3>{title}</h3>
-        <div className="metrics">
-          <strong className="value">{value}</strong>
-          <label>{label}</label>
-        </div>
+        {!children &&
+          <Fragment>
+            <h3>{title}</h3>
+            <div className="metrics">
+              <strong className="value">{value}</strong>
+              <label>{label}</label>
+            </div>
+          </Fragment>
+        }
+        {!!children &&
+          <Fragment>
+            {title && <h3>{title}</h3>}
+            {children}
+          </Fragment>
+        }
       </div>
       <style jsx>{`
         h3 {

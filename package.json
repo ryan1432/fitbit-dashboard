@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-plugin-inline-react-svg": "^0.5.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "isomorphic-unfetch": "^2.0.0",
@@ -24,7 +25,9 @@
     "numeral": "^2.0.6",
     "query-string": "^5.1.0",
     "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "react-date-range": "^0.9.4",
+    "react-dom": "^16.2.0",
+    "react-input-autosize": "^2.2.1"
   },
   "devDependencies": {
     "dotenv": "^5.0.0",
