@@ -1,9 +1,10 @@
 import { Component } from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Component that alerts if you click outside of it
  */
-export default class OutsideAlerter extends Component {
+export default class ClickOutside extends Component {
   constructor (props) {
     super(props)
 
@@ -42,4 +43,9 @@ export default class OutsideAlerter extends Component {
       </div>
     )
   }
+}
+
+ClickOutside.propTypes = {
+  children: PropTypes.any,
+  onClickOutside: PropTypes.func.isRequired,
 }

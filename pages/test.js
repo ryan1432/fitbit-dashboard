@@ -8,7 +8,7 @@ export default class Test extends React.Component {
 
   onChange = e => {
     this.setState({
-      input: e.target.value
+      input: e.target.value,
     })
   }
   render () {

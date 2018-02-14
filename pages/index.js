@@ -1,17 +1,20 @@
-import React, { Fragment } from 'react';
-import fetch from 'isomorphic-unfetch'
-import qs from 'query-string'
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
 import moment from 'moment-immutable'
-import numeral from 'numeral'
-import { DateRange } from 'react-date-range';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { DateRange } from 'react-date-range'
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, ReferenceLine, Legend } from 'recharts'
+
+import request from '../utils/api/request'
+import { roundOff } from '../utils/helpers/numbers'
+import { humanReadablePace } from '../utils/helpers/datetime'
+import { parseActivities } from '../utils/normalizers/activity'
 
 import ClickBoundary from '../components/helpers/ClickOutside'
-import request from '../utils/api/request'
 import Layout from '../components/Layout'
-import Title from '../components/atoms/Title'
 import Tiles from '../components/atoms/Tiles'
 import Tile from '../components/atoms/Tile'
+import CustomTooltip from '../components/molecules/CustomTooltip'
+import Mask from '../components/molecules/Mask'
 
 import withUser from '../components/User'
 
@@ -19,69 +22,30 @@ import colors from '../styles/colors'
 import spacing from '../styles/spacing'
 import typography from '../styles/typography'
 
-import Calendar from '../static/images/calendar.svg';
-
-const PACE_THRESHOLD = (12 * 60)
-
-function humanReadablePace (time) {
-  if (Number.isNaN(time)) return '00:00';
-  const hours = Math.floor(time / 3600);
-  let minutes = Math.floor(time / 60);
-  let seconds = Math.floor(time - minutes * 60);
-  if (minutes < 10) minutes = `0${minutes}`
-  if (seconds < 10) seconds = `0${seconds}`
-  return `${hours ? `${hours}:` : ''}${minutes}:${seconds}`
-}
-
-function roundOff (num) {
-  if (Number.isNaN(num)) return '0.00'
-  return (Math.round(num * 100) / 100).toFixed(2)
-}
-
-function parseActivities (activities) {
-  activities = activities
-    .filter(a => a.pace < PACE_THRESHOLD)
-    .map(a => {
-      a.timestamp = moment(a.startTime).format('MM-DD-YYYY, h:mm a')
-      a.minutePace = (a.pace / 60).toFixed(2)
-      return a
-    })
-
-  const paces = activities
-    .map(a => a.pace)
-    .reduce((total, pace) => total += pace, 0)
-  const heartRates = activities
-    .map(a => a.averageHeartRate)
-    .reduce((total, hr) => total += hr, 0)
-  const distance = activities
-    .reduce((total, { distance = 0, pace }) => {
-      if (pace < PACE_THRESHOLD) total += distance
-      return total
-    }, 0)
-  const steps = activities
-    .reduce((total, { steps = 0 }) => {
-      return total += steps
-    }, 0)
-
-  const averagePaceDec = paces / activities.length
-  const averagePace = humanReadablePace(averagePaceDec)
-  const averageHeartRate = roundOff(heartRates / activities.length)
-  return {
-    activities,
-    averagePace,
-    averagePaceDec,
-    averageHeartRate,
-    steps: numeral(steps).format('0,0'),
-    distance: roundOff(distance),
-  }
-}
+import Calendar from '../static/images/calendar.svg'
 
 export class Index extends React.Component {
   static async getInitialProps ({ req }) {
-    const baseUrl = req ? `${req.protocol}://${req.get('Host')}` : '';
-    const afterDate = moment().startOf('month').format('YYYY-MM-DD');
-    const beforeDate = moment().format('YYYY-MM-DD');
-
+    const afterDate = moment().startOf('month').format('YYYY-MM-DD')
+    const beforeDate = moment().format('YYYY-MM-DD')
+    let token
+    if (req) {
+      // console.log('server')
+      token = req.cookies.access_token
+      // console.log(req.cookies.expires_in)
+    } else {
+      // console.log('browser')
+      token = global.window.localStorage.getItem('access_token')
+      // console.log(global.window.localStorage.getItem('token'))
+      // console.log(global.window.localStorage.getItem('expires_in'))
+    }
+    if (!token || token === 'undefined') {
+      return {
+        beforeDate,
+        afterDate,
+        blocked: true,
+      }
+    }
     let activities = await request('/activity', {
       req,
       params: {
@@ -92,29 +56,29 @@ export class Index extends React.Component {
     return {
       afterDate,
       beforeDate,
+      blocked: !token,
       ...parseActivities(activities),
-    };
+    }
   }
 
   constructor (props) {
     super(props)
     this.state = {
-      ...props
+      ...props,
     }
   }
 
   handleChange = (e) => {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     })
   }
 
   handleSelect = ({ startDate, endDate }) => {
-    if (!endDate) return
     this.setState({
-      afterDate: startDate.format('YYYY-MM-DD'),
-      beforeDate: endDate.format('YYYY-MM-DD')
-    }, () => this.getActivities())
+      __afterDate: startDate.format('YYYY-MM-DD'),
+      __beforeDate: endDate.format('YYYY-MM-DD'),
+    })
   }
 
   getActivities = async () => {
@@ -133,12 +97,31 @@ export class Index extends React.Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    this.getActivities();
+    this.getActivities()
   }
 
   toggleCalendar = (calendarOpen) => {
+    let {
+      beforeDate,
+      __beforeDate,
+      afterDate,
+      __afterDate,
+    } = this.state
+    let nextBeforeDate
+    let nextAfterDate
+    if (!calendarOpen) {
+      nextBeforeDate = __beforeDate
+      nextAfterDate = __afterDate
+    }
     this.setState({
       calendarOpen,
+      beforeDate: nextBeforeDate || beforeDate,
+      afterDate: nextAfterDate || afterDate,
+    }, () => {
+      if (calendarOpen) return
+      if (beforeDate !== nextBeforeDate || afterDate !== nextAfterDate) {
+        this.getActivities()
+      }
     })
   }
 
@@ -148,18 +131,20 @@ export class Index extends React.Component {
       averagePace,
       averageHeartRate,
       steps,
-      activities,
       beforeDate,
       afterDate,
+      activities,
     } = this.state
-    const { user } = this.props
-    const chartdata = activities.sort((a, b) => {
+    const { blocked } = this.props
+    const activitiesAsc = activities.concat().sort((a, b) => {
       const aMoment = moment(a.startTime)
       const bMoment = moment(b.startTime)
-      if (aMoment.isBefore(bMoment)) return -1;
-      if (aMoment.isAfter(bMoment)) return 1;
-      return 0;
+      if (aMoment.isBefore(bMoment)) return -1
+      if (aMoment.isAfter(bMoment)) return 1
+      return 0
     })
+
+    const { user } = this.props
     const header = (
       <form onSubmit={this.onSubmit} className="container form">
         <div className="avatar">
@@ -186,9 +171,9 @@ export class Index extends React.Component {
                     endDate={moment(this.state.beforeDate, 'YYYY-MM-DD')}
                     maxDate={moment().startOf('day')}
                     minDate={moment().subtract(1, 'year')}
-          					onInit={this.handleSelect}
-          					onChange={this.handleSelect}
-          				/>
+                    onInit={this.handleSelect}
+                    onChange={this.handleSelect}
+                  />
                 </div>
               }
             </Fragment>
@@ -215,7 +200,7 @@ export class Index extends React.Component {
           .datepicker-container {
             display: flex;
             justify-content: flex-end;
-            align-items: center
+            align-items: center;
             position: relative;
           }
           label {
@@ -231,6 +216,8 @@ export class Index extends React.Component {
             box-shadow: 0 4px 4px -1px ${colors.grey};
             border-radius: 2px;
             z-index: 1;
+            width: 560px;
+            max-width: 100vw;
           }
           .datepicker-input {
             background: transparent;
@@ -241,7 +228,7 @@ export class Index extends React.Component {
             -webkit-font-smoothing: antialiased;
             cursor: pointer;
             display: flex;
-            align-self: flex-end
+            align-self: flex-end;
             align-items: center;
           }
           .datepicker-input:focus {
@@ -251,91 +238,104 @@ export class Index extends React.Component {
         `}</style>
       </form>
     )
-    const [selectedActivity] = activities
-    let selectedActivityStartTime
-    if (selectedActivity) {
-      selectedActivityStartTime = moment(selectedActivity.startTime)
-    }
+
     return (
-      <Layout title="Dashboard" header={header}>
-        <Tiles>
-          <Tile title="Total activities" value={activities.length} />
-          <Tile title="Total distance" label="miles" value={distance} />
-          <Tile title="Total steps" value={steps} />
-          <Tile title="Average pace" label="/ mile" value={averagePace} />
-          <Tile title="Average HR" label="bpm" value={averageHeartRate} />
-        </Tiles>
-        <Tiles>
-          <Tile>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Distance</th>
-                    <th>Pace</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.activities
-                    .map(a => (
-                      <tr key={a.logId}>
-                        <td>{a.timestamp}</td>
-                        <td>{roundOff(a.distance)}<span className="suffix">miles</span></td>
-                        <td>{humanReadablePace(a.pace)}<span className="suffix">/ mile</span></td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </Tile>
-          <Tile title="Compare your runs">
+      <Fragment>
+        <Layout title="Dashboard" header={header} blur={blocked}>
+          <Tiles>
+            <Tile title="Total activities" value={activities.length} />
+            <Tile title="Total distance" label="miles" value={distance} />
+            <Tile title="Total steps" value={steps} />
+            <Tile title="Average pace" label="/ mile" value={averagePace} />
+            <Tile title="Average HR" label="bpm" value={averageHeartRate} />
+          </Tiles>
+          <Tiles>
+            <Tile>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Distance</th>
+                      <th>Pace</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activities
+                      .map(a => (
+                        <tr key={a.logId}>
+                          <td>{a.timestamp}</td>
+                          <td>{roundOff(a.distance)}<span className="suffix">miles</span></td>
+                          <td>{humanReadablePace(a.pace)}<span className="suffix">/ mile</span></td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </Tile>
+            <Tile align="center">
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartdata.map(a => { a.date = moment(a.startTime).format('M/D/YY'); return a })} width={600} height={300}>
+                <LineChart
+                  data={activitiesAsc.map(a => { a.date = moment(a.startTime).format('M/D/YY'); return a })}
+                  width={600}
+                  height={300}
+                  margin={{top: 10, right: 50, left: -16, bottom: 0}}
+                >
                   <XAxis dataKey="date" />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip content={<CustomTooltip />} />
                   <ReferenceLine y={this.state.averagePaceDec / 60} stroke={colors.orange} isFront strokeDasharray="3 3" />
                   <CartesianGrid strokeDasharray="1 6"/>
-                  <Line type="monotone" dataKey="minutePace" stroke={colors.green} strokeWidth={2} />
-                  <Line type="monotone" dataKey="distance" stroke={colors.blue} strokeWidth={2} />
+                  <Line name="Pace" unit="mph" type="monotone" dataKey="minutePace" stroke={colors.green} strokeWidth={2} />
+                  <Line name="Distance" unit="miles" type="monotone" dataKey="distance" stroke={colors.blue} strokeWidth={2} />
+                  <Legend />
                 </LineChart>
               </ResponsiveContainer>
-          </Tile>
-        </Tiles>
-        <style jsx>{`
-          .suffix {
-            color: ${colors.grey}
-            font-size: ${typography.text.small}
-            padding-left: ${spacing.small}
-          }
-          .table-container {
-            max-height: 360px;
-            overflow:auto;
-          }
-          .table-container table {
-            width: calc(100% - ${spacing.small})
-          }
-          ::-webkit-scrollbar {
-            width: ${spacing.small};
-          }
+            </Tile>
+          </Tiles>
+          <style jsx>{`
+            .suffix {
+              color: ${colors.grey};
+              font-size: ${typography.text.small};
+              padding-left: ${spacing.small};
+            }
+            .table-container {
+              max-height: 360px;
+              overflow:auto;
+            }
+            .table-container table {
+              width: calc(100% - ${spacing.small});
+            }
+            ::-webkit-scrollbar {
+              width: ${spacing.small};
+            }
 
-          ::-webkit-scrollbar-track {
-            background: transparent;
-          }
+            ::-webkit-scrollbar-track {
+              background: transparent;
+            }
 
-          ::-webkit-scrollbar-thumb {
-            background ${colors.grey};
-            border-radius: 12px;
-          }
-        `}</style>
-      </Layout>
+            ::-webkit-scrollbar-thumb {
+              background: ${colors.grey};
+              border-radius: 12px;
+            }
+          `}</style>
+        </Layout>
+        {blocked && <Mask />}
+      </Fragment>
     )
   }
 }
 
 Index.defaultProps = {
-  activities: []
+  activities: [],
+}
+
+Index.propTypes = {
+  user: PropTypes.shape({
+    avatar: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+  }),
+  blocked: PropTypes.bool,
 }
 
 export default withUser(Index)

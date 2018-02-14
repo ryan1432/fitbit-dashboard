@@ -1,13 +1,15 @@
 import { Fragment } from 'react'
+import PropTypes from 'prop-types'
+import classnames from 'classnames'
 
 import colors from '../../styles/colors'
 import spacing from '../../styles/spacing'
 import typography from '../../styles/typography'
 
-export default function Tile ({ title, value, label, children }) {
+export default function Tile ({ title, value, label, children, align }) {
   return (
     <div className="tile--container">
-      <div className="tile">
+      <div className={classnames('tile', align)}>
         {!children &&
           <Fragment>
             <h3>{title}</h3>
@@ -31,6 +33,11 @@ export default function Tile ({ title, value, label, children }) {
           margin-bottom: 1rem;
           font-weight: normal;
           color: ${colors.darkGrey};
+        }
+        .center {
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .tile--container {
           padding: ${spacing.small};
@@ -56,7 +63,7 @@ export default function Tile ({ title, value, label, children }) {
           line-height: ${typography.text.xlarge};
         }
         label {
-          color ${colors.grey};
+          color: ${colors.grey};
           white-space: nowrap;
         }
         .tile {
@@ -75,4 +82,12 @@ export default function Tile ({ title, value, label, children }) {
       `}</style>
     </div>
   )
+}
+
+Tile.propTypes = {
+   title: PropTypes.string,
+   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+   label: PropTypes.string,
+   children: PropTypes.any,
+   align: PropTypes.oneOf(['center']),
 }

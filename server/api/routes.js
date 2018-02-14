@@ -1,7 +1,8 @@
 const request = require('request')
 const express = require('express')
 const router = express.Router()
-const moment = require('moment-immutable')
+
+const helpers = require('../helpers')
 
 const FITBIT_API_URL = 'https://api.fitbit.com/1'
 
@@ -10,86 +11,135 @@ let activities = {
 }
 
 function getNextPage ({ url, headers, res, req }) {
+  console.log('Getting next page of activities')
+
   request.get({
     url,
     headers,
-  }, (err, response) => {
-    if (err) {
-      res.send(500, err)
+    json: true,
+  }, (err, { statusCode, body }) => {
+    if (err || statusCode < 200 || statusCode >= 300) {
+      console.log(err, body)
+      res.status(statusCode).json(body)
     }
-    const body = JSON.parse(response.body)
-
     activities.value = activities.value.concat(body.activities)
     if (body.pagination.next) {
       getNextPage({ url: body.pagination.next, headers, res, req })
     } else {
-      res.json(activities.value.filter(activity => filterToRange(req.query.beforeDate, activity)))
+      res.json(activities.value.filter(activity => helpers.filterToRange(req.query.beforeDate, activity)))
     }
   })
 }
 
-function filterToRange (endDate, activity) {
-  if (!endDate) return true
-  let activityMoment = moment(activity.startTime)
-  return activityMoment.isSameOrBefore(endDate)
-}
+router.get('/activity', async (req, res) => {
+  console.log('Getting user activities')
 
-router.get('/activity', (req, res) => {
-  const headers = {
-    Authorization: req.headers.authorization,
-    'Accept-Language': 'en_US',
-  }
   if (!req.headers.authorization) {
+    // @TODO: ERROR HANDLING
     return res.json([])
   }
-  request
-    .get({
-      url: `${FITBIT_API_URL}/user/-/activities/list.json`,
-      headers,
-      qs: {
-        offset: 0,
-        limit: 20,
-        sort: 'desc',
-        afterDate: req.query.afterDate,
-      },
-    }, (err, response) => {
-      if (err || response.statusCode < 200 || response.statusCode >= 300) {
-        return res.status(response.statusCode).json(response.body)
-      }
-      const body = JSON.parse(response.body)
-      activities.value = body.activities
-      if (body.pagination.next) {
-        getNextPage({ url: body.pagination.next, headers, res, req })
-      } else {
-        res.json(activities.value.filter(activity => filterToRange(req.query.beforeDate, activity)))
-      }
-    })
-}, (err, res, next) => {
-  if (err) console.log('err!!!', err)
-  next()
+
+  let authorization = req.headers.authorization
+
+  const headers = {
+    Authorization: authorization,
+    'Accept-Language': 'en_US',
+  }
+
+  request.get({
+    url: `${FITBIT_API_URL}/user/-/activities/list.json`,
+    headers,
+    json: true,
+    qs: {
+      offset: 0,
+      limit: 20,
+      sort: 'desc',
+      afterDate: req.query.afterDate,
+    },
+  }, (err, { statusCode, body }) => {
+    if (err || statusCode < 200 || statusCode >= 300) {
+      console.log('error getting activities', body)
+      return res.status(statusCode).json(body)
+    }
+    activities.value = body.activities
+    if (body.pagination.next) {
+      getNextPage({ url: body.pagination.next, headers, res, req })
+    } else {
+      res.json(activities.value.filter(activity => helpers.filterToRange(req.query.beforeDate, activity)))
+    }
+  })
 })
 
-router.get('/profile', (req, res) => {
+router.get('/profile', async (req, res) => {
+  console.log('Getting user profile')
+
+  if (!req.headers.authorization) {
+    // @TODO: ERROR HANDLING
+    return res.json({})
+  }
+
+  let authorization = req.headers.authorization
+
   const headers = {
-    Authorization: req.headers.authorization,
+    Authorization: authorization,
     'Accept-Language': 'en_US',
   }
-  if (!req.headers.authorization) {
-    return res.json([])
-  }
+
   request.get({
     url: `${FITBIT_API_URL}/user/-/profile.json`,
     headers,
-  }, (err, response) => {
-    if (err || response.statusCode < 200 || response.statusCode >= 300) {
-      return res.status(response.statusCode).json(response.body)
+    json: true,
+  }, (err, { statusCode, body }) => {
+    if (err || statusCode < 200 || statusCode >= 300) {
+      console.log('error getting profile', body)
+      return res.status(statusCode).json(body)
     }
-    const body = JSON.parse(response.body)
     res.json(body.user)
   })
-}, (err, res, next) => {
-  if (err) console.log('err!!!', err)
-  next()
+})
+
+router.get('/authorize', (req, res, next) => {
+  console.log('Authorizing the user', req.query.code, helpers.getClientToken())
+
+  request.post({
+    url: 'https://api.fitbit.com/oauth2/token',
+    json: true,
+    headers: {
+      authorization: `Basic ${helpers.getClientToken()}`,
+    },
+    form: {
+      code: req.query.code,
+      redirect_uri: `${process.env.APP_URL}${process.env.FITBIT_CALLBACK_ENDPOINT}`,
+      grant_type: 'authorization_code',
+    },
+  }, (err, { statusCode, body }) => {
+    if (err || (statusCode < 200 || statusCode >= 300)) {
+      console.log(err, body)
+      return res.status(statusCode).json(body)
+    }
+    res.json(helpers.storeCredentials(res, body))
+  })
+})
+
+router.get('/authorize/refresh', (req, res) => {
+  console.log('Refreshing the token')
+  request.post({
+    url: 'https://api.fitbit.com/oauth2/token',
+    json: true,
+    headers: {
+      authorization: `Basic ${helpers.getClientToken()}`,
+    },
+    form: {
+      refresh_token: req.cookies.refresh_token,
+      grant_type: 'refresh_token',
+    },
+  }, (err, { statusCode, body }) => {
+    if (err || (statusCode < 200 || statusCode >= 300)) {
+      console.log('error refreshing token', body)
+      return res.status(statusCode).json(body)
+    }
+    res.json(helpers.storeCredentials(res, body))
+  })
 })
 
 module.exports = router

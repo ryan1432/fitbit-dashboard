@@ -1,6 +1,8 @@
+import PropTypes from 'prop-types'
+
 import spacing from '../../styles/spacing'
 
-export default ({ children }) => {
+export default function Tiles ({ children }) {
   return (
     <div className="tiles">
       {children}
@@ -15,4 +17,8 @@ export default ({ children }) => {
       `}</style>
     </div>
   )
+}
+
+Tiles.propTypes = {
+  children: PropTypes.any,
 }

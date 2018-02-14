@@ -3,6 +3,7 @@
   "ignore": ["node_modules", ".next"],
   "watch": [
     "server/api/*",
+    "server/helpers/*",
     "server.js"
   ],
   "ext": "js json"

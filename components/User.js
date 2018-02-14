@@ -5,9 +5,8 @@ import request from '../utils/api/request'
 let user
 
 export default function withUser (WrappedComponent) {
-  return class extends React.Component {
+  return class GetUser extends React.Component {
     static async getInitialProps (ctx) {
-      console.log('in user getInitialProps')
       const childProps = await WrappedComponent.getInitialProps(ctx)
       if (user) {
         return {
