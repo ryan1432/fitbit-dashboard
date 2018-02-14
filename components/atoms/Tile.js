@@ -6,10 +6,10 @@ import colors from '../../styles/colors'
 import spacing from '../../styles/spacing'
 import typography from '../../styles/typography'
 
-export default function Tile ({ title, value, label, children, align }) {
+export default function Tile ({ title, value, label, children, align, type }) {
   return (
     <div className="tile--container">
-      <div className={classnames('tile', align)}>
+      <div className={classnames('tile', align, type)}>
         {!children &&
           <Fragment>
             <h3>{title}</h3>
@@ -43,6 +43,12 @@ export default function Tile ({ title, value, label, children, align }) {
           padding: ${spacing.small};
           flex: 1;
           text-align: center;
+        }
+        .info {
+          border-bottom: 3px solid ${colors.blue};
+        }
+        .positive {
+          border-bottom: 3px solid ${colors.green};
         }
         .metrics {
           display: flex;
@@ -85,9 +91,10 @@ export default function Tile ({ title, value, label, children, align }) {
 }
 
 Tile.propTypes = {
-   title: PropTypes.string,
-   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-   label: PropTypes.string,
-   children: PropTypes.any,
-   align: PropTypes.oneOf(['center']),
+  title: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  label: PropTypes.string,
+  children: PropTypes.any,
+  align: PropTypes.oneOf(['center']),
+  type: PropTypes.oneOf(['info', 'positive']),
 }

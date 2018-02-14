@@ -243,11 +243,11 @@ export class Index extends React.Component {
       <Fragment>
         <Layout title="Dashboard" header={header} blur={blocked}>
           <Tiles>
-            <Tile title="Total activities" value={activities.length} />
-            <Tile title="Total distance" label="miles" value={distance} />
-            <Tile title="Total steps" value={steps} />
-            <Tile title="Average pace" label="/ mile" value={averagePace} />
-            <Tile title="Average HR" label="bpm" value={averageHeartRate} />
+            <Tile title="Total activities" value={activities.length} type="positive" />
+            <Tile title="Total distance" label="miles" value={distance} type="positive" />
+            <Tile title="Total steps" value={steps} type="positive"/>
+            <Tile title="Average pace" label="/ mile" value={averagePace} type="info" />
+            <Tile title="Average HR" label="bpm" value={averageHeartRate} type="info" />
           </Tiles>
           <Tiles>
             <Tile>
