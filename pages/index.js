@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import moment from 'moment-immutable'
 import { DateRange } from 'react-date-range'
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, ReferenceLine, Legend } from 'recharts'
+import Link from 'next/link'
 
 import request from '../utils/api/request'
 import { roundOff } from '../utils/helpers/numbers'
@@ -149,7 +150,10 @@ export class Index extends React.Component {
       <form onSubmit={this.onSubmit} className="container form">
         <div className="avatar">
           <img src={user.avatar} />
-          Heya, {user.firstName}!
+          <span className="greting">
+            Heya, {user.firstName}!
+            <small>Not you? <Link href="/logout" prefetch><a className="test">Log out</a></Link></small>
+          </span>
         </div>
         <div className="datepicker-container">
           <label>Date range:</label>
@@ -189,6 +193,19 @@ export class Index extends React.Component {
           .avatar {
             display: flex;
             align-items: center;
+          }
+          .greeting {
+            display: flex;
+            align-items: flex-end;
+          }
+          small {
+            font-size: ${typography.text.small};
+            margin-left: ${spacing.small};
+          }
+          small a {
+            color: ${colors.text};
+            text-decoration: none;
+            margin-left: ${spacing.small};
           }
           .avatar img {
             overflow: hidden;

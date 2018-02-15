@@ -99,7 +99,7 @@ router.get('/profile', async (req, res) => {
 })
 
 router.get('/authorize', (req, res, next) => {
-  console.log('Authorizing the user', req.query.code, helpers.getClientToken())
+  console.log('Authorizing the user')
 
   request.post({
     url: 'https://api.fitbit.com/oauth2/token',
@@ -139,6 +139,28 @@ router.get('/authorize/refresh', (req, res) => {
       return res.status(statusCode).json(body)
     }
     res.json(helpers.storeCredentials(res, body))
+  })
+})
+
+router.get('/authorize/logout', (req, res) => {
+  console.log('Logging out')
+  request.post({
+    url: 'https://api.fitbit.com/oauth2/revoke',
+    json: true,
+    headers: {
+      authorization: `Basic ${helpers.getClientToken()}`,
+    },
+    form: {
+      token: req.cookies.access_token,
+    },
+  }, (err, { statusCode, body }) => {
+    if (err || (statusCode < 200 || statusCode >= 300)) {
+      console.log('error revoking token', body)
+      return res.status(statusCode).json(body)
+    }
+    res.clearCookie('access_token')
+    res.clearCookie('refresh_token')
+    res.json({ success: true })
   })
 })
 

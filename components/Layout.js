@@ -32,6 +32,11 @@ export default function Layout ({ header, children, title, blur }) {
         *, *:before, *:after {
           box-sizing: border-box;
         }
+
+        a {
+          color: ${colors.text};
+        }
+
         body {
           font-family: 'Helvetica Neue', arial, sans-serif;
           font-size: 1.6rem;
@@ -53,6 +58,7 @@ export default function Layout ({ header, children, title, blur }) {
         footer {
           background: ${colors.white};
           padding: ${spacing.large};
+          border-top: 1px solid ${colors.grey};
         }
         #__next, #__next > div {
           height: 100%;
