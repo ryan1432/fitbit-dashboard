@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment-immutable'
 import { DateRange } from 'react-date-range'
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, ReferenceLine, Legend } from 'recharts'
+import { Text, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, ReferenceLine, Legend } from 'recharts'
 import Link from 'next/link'
 
 import request from '../utils/api/request'
@@ -165,7 +165,11 @@ export class Index extends React.Component {
                 className="datepicker-input"
                 onClick={() => this.toggleCalendar(!this.state.calendarOpen)}
               >
-                <span>{`${moment(afterDate, 'YYYY-MM-DD').format('MMMM D, Y')} to ${moment(beforeDate, 'YYYY-MM-DD').format('MMMM D, Y')}`}</span>
+                <span className="datepicker-range-text">
+                  <span>{moment(afterDate, 'YYYY-MM-DD').format('MMMM D, Y')}</span>
+                  <span>to</span>
+                  <span>{moment(beforeDate, 'YYYY-MM-DD').format('MMMM D, Y')}</span>
+                </span>
                 <Calendar className="icon--small icon--text-color"/>
               </span>
               {this.state.calendarOpen &&
@@ -189,10 +193,30 @@ export class Index extends React.Component {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-direction: column;
+          }
+          .datepicker-range-text {
+            display: flex;
+            align-items: center;
+          }
+          .datepicker-range-text span:not(:last-child) {
+            padding: 0 ${spacing.small} 0 0;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+          @media(min-width: 768px) {
+            .form {
+              flex-direction: row;
+            }
+            .avatar {
+              margin-bottom: 0;
+            }
           }
           .avatar {
             display: flex;
             align-items: center;
+            margin-bottom: ${spacing.small};
           }
           .greeting {
             display: flex;
@@ -220,6 +244,14 @@ export class Index extends React.Component {
             align-items: center;
             position: relative;
           }
+          .datepicker-container label {
+            display: none;
+          }
+          @media (min-width: 768px) {
+            .datepicker-container label {
+              display: inline;
+            }
+          }
           label {
             margin-right: ${spacing.small};
             color: ${colors.darkGrey};
@@ -227,14 +259,30 @@ export class Index extends React.Component {
             text-transform: uppercase;
           }
           .datepicker {
-            top: 100%;
             position: absolute;
-            right: 0;
             box-shadow: 0 4px 4px -1px ${colors.grey};
-            border-radius: 2px;
             z-index: 1;
-            width: 560px;
+            width: auto;
+            left: -${spacing.large};
+            right: -${spacing.large};
             max-width: 100vw;
+          }
+          .datepicker :global(.rdr-Calendar) {
+            margin: auto;
+            display: block !important;
+          }
+          @media (min-width: 768px) {
+            .datepicker {
+              top: 100%;
+              right: 0;
+              border-radius: 2px;
+              width: 560px;
+            }
+            .datepicker :global(.rdr-Calendar) {
+              width: 50%;
+              display: inline-block !important;
+              margin: inherit;
+            }
           }
           .datepicker-input {
             background: transparent;
@@ -296,15 +344,17 @@ export class Index extends React.Component {
                   data={activitiesAsc.map(a => { a.date = moment(a.startTime).format('M/D/YY'); return a })}
                   width={600}
                   height={300}
-                  margin={{top: 10, right: 50, left: -16, bottom: 0}}
+                  margin={{top: 0, right: 0, left: -10, bottom: 0}}
                 >
-                  <XAxis dataKey="date" />
-                  <YAxis />
+                  <XAxis dataKey="startTime" tickFormatter={v => moment(v).format('M/D')} />
+                  <YAxis label={{ value: 'MPH', angle: -90, position: 'center', y: 100 }} />
+                  <YAxis yAxisId="right" orientation="right" tickFormatter={v => v || ''} label={{ value: 'BPM', angle: 90, position: 'center', dx: 10 }} />
                   <Tooltip content={<CustomTooltip />} />
                   <ReferenceLine y={this.state.averagePaceDec / 60} stroke={colors.orange} isFront strokeDasharray="3 3" />
                   <CartesianGrid strokeDasharray="1 6"/>
                   <Line name="Pace" unit="mph" type="monotone" dataKey="minutePace" stroke={colors.green} strokeWidth={2} />
                   <Line name="Distance" unit="miles" type="monotone" dataKey="distance" stroke={colors.blue} strokeWidth={2} />
+                  <Line yAxisId="right" name="HR" unit="bpm" type="monotone" dataKey="averageHeartRate" stroke={colors.orange} />
                   <Legend />
                 </LineChart>
               </ResponsiveContainer>
