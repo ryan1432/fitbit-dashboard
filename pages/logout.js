@@ -1,11 +1,11 @@
 import { Component } from 'react'
 import Router from 'next/router'
 
-import request from '../utils/api/request'
+import RequestHelper from '../utils/api/request'
 
 export default class Callback extends Component {
   async componentDidMount () {
-    await request('/authorize/logout', {
+    await RequestHelper.request('/authorize/logout', {
       requireAuth: false,
     })
 

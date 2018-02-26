@@ -1,6 +1,6 @@
 import React from 'react'
 
-import request from '../utils/api/request'
+import RequestHelper from '../utils/api/request'
 
 let user
 
@@ -15,7 +15,7 @@ export default function withUser (WrappedComponent) {
         }
       }
 
-      let newUser = await request('/profile', { req: ctx.req })
+      let newUser = await RequestHelper.request('/profile', { req: ctx.req })
       return {
         user: newUser,
         ...childProps,

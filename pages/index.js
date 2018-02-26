@@ -2,10 +2,10 @@ import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment-immutable'
 import { DateRange } from 'react-date-range'
-import { Text, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, ReferenceLine, Legend } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, ReferenceLine, Legend } from 'recharts'
 import Link from 'next/link'
 
-import request from '../utils/api/request'
+import RequestHelper from '../utils/api/request'
 import { roundOff } from '../utils/helpers/numbers'
 import { humanReadablePace } from '../utils/helpers/datetime'
 import { parseActivities } from '../utils/normalizers/activity'
@@ -40,14 +40,8 @@ export class Index extends React.Component {
       // console.log(global.window.localStorage.getItem('token'))
       // console.log(global.window.localStorage.getItem('expires_in'))
     }
-    if (!token || token === 'undefined') {
-      return {
-        beforeDate,
-        afterDate,
-        blocked: true,
-      }
-    }
-    let activities = await request('/activity', {
+
+    let activities = await RequestHelper.request('/activity', {
       req,
       params: {
         afterDate,
@@ -82,9 +76,9 @@ export class Index extends React.Component {
     })
   }
 
-  getActivities = async () => {
+  getActivities = async (req) => {
     const { beforeDate, afterDate } = this.state
-    const activities = await request('/activity', {
+    const activities = await RequestHelper.request('/activity', {
       params: {
         beforeDate,
         afterDate,
@@ -275,6 +269,7 @@ export class Index extends React.Component {
             .datepicker {
               top: 100%;
               right: 0;
+              left: auto;
               border-radius: 2px;
               width: 560px;
             }

@@ -138,6 +138,7 @@ router.get('/authorize/refresh', (req, res) => {
       console.log('error refreshing token', body)
       return res.status(statusCode).json(body)
     }
+    
     res.json(helpers.storeCredentials(res, body))
   })
 })

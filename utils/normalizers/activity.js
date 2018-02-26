@@ -33,7 +33,7 @@ export function parseActivities (activities = []) {
 
   const averagePaceDec = paces / activities.length
   const averagePace = humanReadablePace(averagePaceDec)
-  const averageHeartRate = roundOff(heartRates / activities.length)
+  const averageHeartRate = Math.floor(heartRates / activities.length)
   return {
     activities,
     averagePace,
