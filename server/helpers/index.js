@@ -7,7 +7,6 @@ const getClientToken = () => {
 const storeCredentials = (response, body) => {
   response.cookie('access_token', body.access_token)
   response.cookie('refresh_token', body.refresh_token)
-  response.cookie('expires', moment().add(body.expires_in, 'seconds'))
   return body
 }
 

@@ -94,7 +94,7 @@ router.get('/profile', async (req, res) => {
       console.log('error getting profile', body)
       return res.status(statusCode).json(body)
     }
-    res.json(body.user)
+    res.json({ user: body.user })
   })
 })
 
@@ -138,7 +138,7 @@ router.get('/authorize/refresh', (req, res) => {
       console.log('error refreshing token', body)
       return res.status(statusCode).json(body)
     }
-    
+    res.cookie('abc', 'test');
     res.json(helpers.storeCredentials(res, body))
   })
 })

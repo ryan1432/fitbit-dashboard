@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 import Link from 'next/link'
 
 import RequestHelper from '../utils/api/request'
+import AuthHelper from '../utils/api/auth'
 import { roundOff } from '../utils/helpers/numbers'
 import { humanReadablePace } from '../utils/helpers/datetime'
 import { parseActivities } from '../utils/normalizers/activity'
@@ -27,30 +28,28 @@ import Calendar from '../static/images/calendar.svg'
 
 export class Index extends React.Component {
   static async getInitialProps ({ req }) {
-    const afterDate = moment().startOf('month').format('YYYY-MM-DD')
-    const beforeDate = moment().format('YYYY-MM-DD')
-    let token
-    if (req) {
-      // console.log('server')
-      token = req.cookies.access_token
-      // console.log(req.cookies.expires_in)
-    } else {
-      // console.log('browser')
-      token = global.window.localStorage.getItem('access_token')
-      // console.log(global.window.localStorage.getItem('token'))
-      // console.log(global.window.localStorage.getItem('expires_in'))
+    const beforeDateMoment = moment()
+    let afterDateMoment = beforeDateMoment.startOf('month')
+    if (beforeDateMoment.diff(afterDateMoment, 'days') < 7) {
+      afterDateMoment = beforeDateMoment.subtract(7, 'days')
     }
 
-    let activities = await RequestHelper.request('/activity', {
+    const beforeDate = beforeDateMoment.format('YYYY-MM-DD')
+    const afterDate = afterDateMoment.format('YYYY-MM-DD')
+    let token = AuthHelper.getAccessToken({ req })
+
+    let { body: activities, auth } = await RequestHelper.request('/activity', {
       req,
       params: {
         afterDate,
         beforeDate,
       },
     })
+
     return {
       afterDate,
       beforeDate,
+      auth,
       blocked: !token,
       ...parseActivities(activities),
     }
@@ -61,6 +60,10 @@ export class Index extends React.Component {
     this.state = {
       ...props,
     }
+  }
+
+  componentDidMount () {
+    AuthHelper.set(this.props.auth)
   }
 
   handleChange = (e) => {
@@ -78,12 +81,14 @@ export class Index extends React.Component {
 
   getActivities = async (req) => {
     const { beforeDate, afterDate } = this.state
-    const activities = await RequestHelper.request('/activity', {
+    const { body: activities, auth } = await RequestHelper.request('/activity', {
       params: {
         beforeDate,
         afterDate,
       },
     })
+
+    AuthHelper.set(auth)
 
     this.setState({
       ...parseActivities(activities),
@@ -199,6 +204,12 @@ export class Index extends React.Component {
             text-overflow: ellipsis;
             overflow: hidden;
           }
+          .avatar {
+            display: flex;
+            align-items: center;
+            margin-bottom: ${spacing.small};
+          }
+
           @media(min-width: 768px) {
             .form {
               flex-direction: row;
@@ -206,11 +217,6 @@ export class Index extends React.Component {
             .avatar {
               margin-bottom: 0;
             }
-          }
-          .avatar {
-            display: flex;
-            align-items: center;
-            margin-bottom: ${spacing.small};
           }
           .greeting {
             display: flex;
@@ -398,6 +404,7 @@ Index.propTypes = {
     firstName: PropTypes.string.isRequired,
   }),
   blocked: PropTypes.bool,
+  auth: PropTypes.object,
 }
 
 export default withUser(Index)
