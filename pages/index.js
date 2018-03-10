@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment-immutable'
+import Router from 'next/router'
+import qs from 'query-string'
 
 import RequestHelper from '../utils/api/request'
 import { parseActivities } from '../utils/normalizers/activity'
@@ -44,8 +46,12 @@ export class Index extends React.Component {
       afterDateMoment = beforeDateMoment.subtract(7, 'days')
     }
 
-    const beforeDate = beforeDateMoment.format('YYYY-MM-DD')
-    const afterDate = afterDateMoment.format('YYYY-MM-DD')
+    const params = qs.parse(window.location.search)
+    let beforeDate = beforeDateMoment.format('YYYY-MM-DD')
+    let afterDate = afterDateMoment.format('YYYY-MM-DD')
+
+    if (params.start) afterDate = params.start
+    if (params.end) beforeDate = params.end
 
     let { body, error } = await RequestHelper.request('/activity', {
       params: {
@@ -121,6 +127,7 @@ export class Index extends React.Component {
     }, () => {
       if (calendarOpen) return
       if (beforeDate !== nextBeforeDate || afterDate !== nextAfterDate) {
+        Router.push({ pathname: '/', query: { start: this.state.afterDate, end: this.state.beforeDate } })
         this.getActivities()
       }
     })

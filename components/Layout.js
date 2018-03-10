@@ -24,7 +24,7 @@ export default function Layout ({ header, children, title, blur }) {
         </div>
         <footer>
           <div className="container">
-            Created by <a href="https://github.com/nickjvm">@nickjvm</a>
+            Created by <a rel="noopener noreferrer" href="https://github.com/nickjvm" target="_blank">@nickjvm</a>
           </div>
         </footer>
       </div>

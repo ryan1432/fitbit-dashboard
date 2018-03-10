@@ -24,7 +24,7 @@ class RequestHelper {
         if (!responseBody.errors.some(e => e.errorType === 'expired_token')) return { error }
 
         this.refreshInFlight = true
-        const refreshToken = AuthHelper.getRefreshToken({ req: options.req })
+        const refreshToken = AuthHelper.getRefreshToken()
         const credentials = await fetch(`${process.env.APP_URL}api/authorize/refresh`, {
           credentials: 'include',
           headers: {
