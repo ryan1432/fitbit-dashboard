@@ -1,4 +1,6 @@
+import PropTypes from 'prop-types'
 import qs from 'query-string'
+import classnames from 'classnames'
 import Color from 'color'
 
 import Container from '../atoms/Container'
@@ -19,7 +21,7 @@ const AUTHORIZE_URL = `${process.env.FITBIT_OAUTH_URL}?${qs.stringify({
 
 export default function Mask (props) {
   return (
-    <div className="mask">
+    <div className={classnames('mask', props.visible && 'visible')}>
       <Container max="400px">
         <div className="mask-inner">
           <h2>Hey there!</h2>
@@ -40,6 +42,13 @@ export default function Mask (props) {
           display: flex;
           align-items: center;
           justify-content: center;
+          visibility: hidden;
+          opacity: 0;
+          transition: all .2s;
+        }
+        .visible {
+          opacity: 1;
+          visibility: visible;
         }
         h2 {
           font-size: ${typography.text.large};
@@ -58,4 +67,8 @@ export default function Mask (props) {
         `}</style>
     </div>
   )
+}
+
+Mask.propTypes = {
+  visible: PropTypes.bool,
 }

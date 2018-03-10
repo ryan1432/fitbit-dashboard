@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import Head from 'next/head'
+import classnames from 'classnames'
 
 import colors from '../styles/colors'
 import spacing from '../styles/spacing'
@@ -7,12 +8,13 @@ import typography from '../styles/typography'
 
 export default function Layout ({ header, children, title, blur }) {
   return (
-    <div className={blur && 'blur'}>
+    <div className={classnames('outer-container', blur && 'blur')}>
       <Head>
         <title>{title}</title>
         <meta charSet='utf-8' />
         <meta httpEquiv='X-UA-Compatible' content='IE=edge' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <link type="image/x-icon" rel="shortcut icon" href="/static/favicon.png" />
       </Head>
 
       <div className="outer-container">
@@ -70,6 +72,9 @@ export default function Layout ({ header, children, title, blur }) {
         }
         .main {
           flex-grow: 1;
+        }
+        .outer-container {
+          transition: filter .3s;
         }
         .container {
           width: 100%;

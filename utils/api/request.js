@@ -17,6 +17,12 @@ class RequestHelper {
           return { error }
         }
 
+        const responseBody = await response.json()
+          .catch(() => response.text())
+          .catch(() => null)
+
+        if (!responseBody.errors.some(e => e.errorType === 'expired_token')) return { error }
+
         this.refreshInFlight = true
         const refreshToken = AuthHelper.getRefreshToken({ req: options.req })
         const credentials = await fetch(`${process.env.APP_URL}api/authorize/refresh`, {
@@ -51,10 +57,9 @@ class RequestHelper {
     opts.headers = opts.headers || {}
     opts.credentials = 'include'
     if (requireAuth) {
-      let token = AuthHelper.getAccessToken({ req })
+      let token = AuthHelper.getAccessToken()
       if (this.authorization) token = this.authorization.access_token
-
-      opts.headers.authorization = `Bearer ${token}`
+      if (token) opts.headers.authorization = `Bearer ${token}`
     }
 
     return {
@@ -64,6 +69,7 @@ class RequestHelper {
   }
 
   async request (url, options = {}) {
+    console.log(`requesting ${url}`)
     const { url: URL, options: OPTIONS } = this.getConfig(url, options)
     let response = await fetch(URL, OPTIONS)
     if (!response.ok) {

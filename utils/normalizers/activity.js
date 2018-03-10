@@ -15,9 +15,17 @@ export function parseActivities (activities = []) {
       return a
     })
 
-  const paces = activities
-    .map(a => a.pace)
-    .reduce((total, pace) => total += pace, 0)
+  const paces = activities.map(a => a.pace)
+
+  const totalPace = paces.reduce((total, pace) => total += pace, 0)
+  const distances = activities.map(a => a.distance)
+
+  const maxDistance = Math.ceil(Math.max.apply(null, distances) + 1)
+  const minDistance = Math.floor(Math.min.apply(null, distances) - 1)
+
+  const maxPace = Math.ceil(Math.max.apply(null, paces) / 60)
+  const minPace = Math.floor(Math.min.apply(null, paces) / 60)
+
   let heartRates = activities
     .map(a => a.averageHeartRate)
     .reduce((total, hr) => total += hr, 0)
@@ -31,7 +39,7 @@ export function parseActivities (activities = []) {
       return total += steps
     }, 0)
 
-  const averagePaceDec = paces / activities.length
+  const averagePaceDec = totalPace / activities.length
   const averagePace = humanReadablePace(averagePaceDec)
   const averageHeartRate = Math.floor(heartRates / activities.length)
   return {
@@ -39,6 +47,10 @@ export function parseActivities (activities = []) {
     averagePace,
     averagePaceDec,
     averageHeartRate,
+    maxDistance,
+    minDistance,
+    maxPace,
+    minPace,
     steps: numeral(steps).format('0,0'),
     distance: roundOff(distance),
   }

@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie'
-import NextCookies from 'next-cookies'
 
 const KEYS = {
   access_token: 'access_token',
@@ -17,15 +16,15 @@ class AuthHelper {
   }
 
   getAccessToken (ctx) {
-    return NextCookies(ctx)[KEYS.access_token]
+    return Cookies.get(KEYS.access_token)
   }
 
   getRefreshToken (ctx) {
-    return NextCookies(ctx)[KEYS.refresh_token]
+    return Cookies.get(KEYS.refresh_token)
   }
 
   get (ctx) {
-    return NextCookies(ctx)
+    return Cookies.get()
   }
 }
 

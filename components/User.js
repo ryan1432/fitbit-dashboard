@@ -2,9 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import RequestHelper from '../utils/api/request'
-import AuthHelper from '../utils/api/auth'
-
-let user
 
 export default function withUser (WrappedComponent) {
   return class GetUser extends React.Component {
@@ -12,37 +9,25 @@ export default function withUser (WrappedComponent) {
       auth: PropTypes.object,
     }
 
-    static async getInitialProps (ctx) {
-      const childProps = await WrappedComponent.getInitialProps(ctx)
-      if (user) {
-        return {
-          user,
-          ...childProps,
-        }
-      }
+    constructor () {
+      super()
 
-      let { body, auth, error } = await RequestHelper.request('/profile', { req: ctx.req })
-
-      if (error) {
-        return {
-          ...childProps,
-          user: {},
-        }
-      }
-
-      return {
-        user: body.user || {},
-        auth,
-        ...childProps,
+      this.state = {
+        user: {
+          avatar: '',
+          firstName: '',
+        },
       }
     }
 
-    componentDidMount () {
-      AuthHelper.set(this.props.auth)
+    async componentDidMount () {
+      let { body } = await RequestHelper.request('/profile')
+
+      if (body) this.setState({ user: body.user })
     }
 
     render () {
-      return <WrappedComponent {...this.props} />
+      return <WrappedComponent {...this.state} {...this.props} />
     }
   }
 }

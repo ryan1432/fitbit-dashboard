@@ -36,7 +36,7 @@ router.get('/activity', async (req, res) => {
 
   if (!req.headers.authorization) {
     // @TODO: ERROR HANDLING
-    return res.json([])
+    return res.status(401).json({ errors: [{ errorType: 'invalid_token' }] })
   }
 
   let authorization = req.headers.authorization
@@ -75,7 +75,7 @@ router.get('/profile', async (req, res) => {
 
   if (!req.headers.authorization) {
     // @TODO: ERROR HANDLING
-    return res.json({})
+    return res.status(401).json({ errors: [{ errorType: 'invalid_token' }] })
   }
 
   let authorization = req.headers.authorization
@@ -138,7 +138,6 @@ router.get('/authorize/refresh', (req, res) => {
       console.log('error refreshing token', body)
       return res.status(statusCode).json(body)
     }
-    res.cookie('abc', 'test');
     res.json(helpers.storeCredentials(res, body))
   })
 })
