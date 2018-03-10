@@ -10,32 +10,6 @@ const storeCredentials = (response, body) => {
   return body
 }
 
-// const checkToken = (req, res) => {
-//   return new Promise((resolve, reject) => {
-//     console.log('in checkToken')
-//     /* eslint-disable camelcase */
-//     const { access_token, refresh_token } = req.cookies
-//     const { exp } = jwtDecode(access_token)
-//     console.log('>>>>', exp)
-//     if (exp * 1000 < Date.now() - (60 * 60 * 1000)) {
-//       // token will expire within the hour. Lets get a new one.
-//       return request.get({
-//         url: `${process.env.APP_URL}api/authorize/refresh`,
-//         json: true,
-//         headers: {
-//           Cookie: `access_token=${access_token}; refresh_token=${refresh_token}`,
-//         },
-//       }, (err, response) => {
-//         if (err) throw new Error(err)
-//         storeCredentials(res, response.body)
-//         resolve(response.body)
-//       })
-//     }
-//     resolve(false)
-//     /* eslint-enable camelcase */
-//   })
-// }
-
 const filterToRange = (endDate, activity) => {
   if (!endDate) return true
   let activityMoment = moment(activity.startTime)

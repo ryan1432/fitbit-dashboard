@@ -17,7 +17,7 @@ import Header from '../components/molecules/Header'
 import HistoryChart from '../components/molecules/HistoryChart'
 import HistoryTable from '../components/molecules/HistoryTable'
 
-import { DATE_FORMAT } from '../consts'
+import { DATE_FORMAT } from '../utils/constants'
 
 export class Index extends React.Component {
   constructor (props) {

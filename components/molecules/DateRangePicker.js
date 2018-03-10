@@ -5,6 +5,8 @@ import { DateRange } from 'react-date-range'
 
 import ClickBoundary from '../helpers/ClickOutside'
 
+import { DATE_FORMAT } from '../../utils/constants'
+
 import colors from '../../styles/colors'
 import spacing from '../../styles/spacing'
 import typography from '../../styles/typography'
@@ -12,10 +14,6 @@ import typography from '../../styles/typography'
 import Calendar from '../../static/images/calendar.svg'
 
 const TODAY = moment()
-const DATE_FORMAT = {
-  short: 'YYYY-MM-DD',
-  long: 'MMMM D, Y',
-}
 
 export default function DateRangePicker ({
   afterDate,
