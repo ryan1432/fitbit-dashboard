@@ -1,12 +1,14 @@
 {
-  "name": "fitbit",
+  "name": "Fitbit Runner's Dashboard",
   "version": "1.0.0",
-  "description": "",
+  "description": "View running activity stats and history based on a selected date range",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
     "build": "next build",
-    "start": "node server.js"
+    "start": "node server.js",
+    "now-build": "APP_URL=${NOW_URL}\/ next build",
+    "now-start": "APP_URL=${NOW_URL}\/ NODE_ENV=production node server.js"
   },
   "author": "Nick VanMeter",
   "license": "ISC",
