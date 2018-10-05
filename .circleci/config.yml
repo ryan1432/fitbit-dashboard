@@ -1,0 +1,38 @@
+defaults: &defaults
+  docker:
+    - image: circleci/node:8.11.2 # the primary container, where your job's commands are run
+  working_directory: ~/repo
+
+common_commands:
+  - &checkout
+      checkout:
+        path: ~/repo
+  - &restore_cache
+      restore_cache:
+        keys:
+          - v1-dependencies-{{ checksum "yarn.lock" }}
+          - v1-dependencies-
+  - &save_cache
+      save_cache:
+        paths:
+          - node_modules
+        key: v1-dependencies-{{ checksum "yarn.lock" }}
+  - &yarn_install
+      run: yarn install
+  - &yarn_build_dev
+      run: yarn build:dev
+  - &yarn_build
+      run: yarn build
+
+version: 2
+jobs:
+  build_and_test:
+    <<: *defaults
+    steps:
+      - *checkout
+      - *restore_cache
+      - *yarn_install
+      - *save_cache
+      - run: yarn lint
+      - run: yarn test
+      - *yarn_build
