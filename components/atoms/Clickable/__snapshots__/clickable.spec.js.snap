@@ -22,11 +22,28 @@ ShallowWrapper {
       "children": Array [
         "this is a test",
         <JSXStyle
-          css="a.jsx-1068520229{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}"
-          styleId="1068520229"
+          css="a.__jsx-style-dynamic-selector{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);-webkit-text-decoration:none;text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}"
+          dynamic={
+            Array [
+              "12px",
+              "24px",
+              "#46cba0",
+              Object {
+                "color": Array [
+                  160.6015037593985,
+                  56.11814345991559,
+                  40.14705882352941,
+                ],
+                "model": "hsl",
+                "valpha": 1,
+              },
+              "#FFFFFF",
+            ]
+          }
+          styleId="1229652390"
         />,
       ],
-      "className": "jsx-1068520229 ",
+      "className": "jsx-2420113520 ",
     },
     "ref": null,
     "rendered": Array [
@@ -36,8 +53,23 @@ ShallowWrapper {
         "key": undefined,
         "nodeType": "class",
         "props": Object {
-          "css": "a.jsx-1068520229{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}",
-          "styleId": "1068520229",
+          "css": "a.__jsx-style-dynamic-selector{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);-webkit-text-decoration:none;text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}",
+          "dynamic": Array [
+            "12px",
+            "24px",
+            "#46cba0",
+            Object {
+              "color": Array [
+                160.6015037593985,
+                56.11814345991559,
+                40.14705882352941,
+              ],
+              "model": "hsl",
+              "valpha": 1,
+            },
+            "#FFFFFF",
+          ],
+          "styleId": "1229652390",
         },
         "ref": null,
         "rendered": null,
@@ -55,11 +87,28 @@ ShallowWrapper {
         "children": Array [
           "this is a test",
           <JSXStyle
-            css="a.jsx-1068520229{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}"
-            styleId="1068520229"
+            css="a.__jsx-style-dynamic-selector{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);-webkit-text-decoration:none;text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}"
+            dynamic={
+              Array [
+                "12px",
+                "24px",
+                "#46cba0",
+                Object {
+                  "color": Array [
+                    160.6015037593985,
+                    56.11814345991559,
+                    40.14705882352941,
+                  ],
+                  "model": "hsl",
+                  "valpha": 1,
+                },
+                "#FFFFFF",
+              ]
+            }
+            styleId="1229652390"
           />,
         ],
-        "className": "jsx-1068520229 ",
+        "className": "jsx-2420113520 ",
       },
       "ref": null,
       "rendered": Array [
@@ -69,8 +118,23 @@ ShallowWrapper {
           "key": undefined,
           "nodeType": "class",
           "props": Object {
-            "css": "a.jsx-1068520229{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}",
-            "styleId": "1068520229",
+            "css": "a.__jsx-style-dynamic-selector{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);-webkit-text-decoration:none;text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}",
+            "dynamic": Array [
+              "12px",
+              "24px",
+              "#46cba0",
+              Object {
+                "color": Array [
+                  160.6015037593985,
+                  56.11814345991559,
+                  40.14705882352941,
+                ],
+                "model": "hsl",
+                "valpha": 1,
+              },
+              "#FFFFFF",
+            ],
+            "styleId": "1229652390",
           },
           "ref": null,
           "rendered": null,

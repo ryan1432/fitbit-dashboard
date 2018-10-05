@@ -15,5 +15,10 @@
     "comma-dangle": ["error", "always-multiline"],
     "no-return-assign": 0,
     "react/react-in-jsx-scope": 0
+  },
+  "settings": {
+    "react": {
+      version: "^16.2"
+    }
   }
 }
