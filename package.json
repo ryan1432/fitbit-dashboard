@@ -14,7 +14,13 @@
   },
   "author": "Nick VanMeter",
   "license": "ISC",
+  "resolutions": {
+    "babel-core": "7.0.0-bridge.0"
+  },
   "dependencies": {
+    "@babel/core": "^7.1.2",
+    "babel-core": "^7.0.0-bridge",
+    "babel-loader": "^8.0.4",
     "color": "^3.0.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
