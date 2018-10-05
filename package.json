@@ -7,6 +7,7 @@
     "dev": "nodemon server.js",
     "build": "next build",
     "start": "node server.js",
+    "lint": "eslint ./",
     "now-build": "APP_URL=${NOW_URL}/ next build",
     "now-start": "APP_URL=${NOW_URL}/ NODE_ENV=production node server.js",
     "test": "NODE_ENV=test jest"
