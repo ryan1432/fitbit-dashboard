@@ -5,6 +5,12 @@
     "standard",
     "react"
   ],
+  "globals": {
+    "shallow": true
+  },
+  "env": {
+    "jest": true
+  },
   "rules": {
     "comma-dangle": ["error", "always-multiline"],
     "no-return-assign": 0,

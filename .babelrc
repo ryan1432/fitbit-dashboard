@@ -1,9 +1,25 @@
 {
-  "presets": [
-    "next/babel"
-  ],
-  "plugins": [
-    "inline-react-svg",
-    "transform-class-properties"
-  ]
+  "env": {
+    "development": {
+      "presets": ["next/babel"],
+      "plugins": [
+        "inline-react-svg",
+        "transform-class-properties"
+      ]
+    },
+    "production": {
+      "presets": ["next/babel"],
+      "plugins": [
+        "inline-react-svg",
+        "transform-class-properties"
+      ]
+    },
+    "test": {
+      "presets": [["next/babel", { "preset-env": { "modules": "commonjs" } }]],
+      "plugins": [
+        "inline-react-svg",
+        "transform-class-properties"
+      ]
+    }
+  }
 }
