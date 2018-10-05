@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-import spacing from '../../styles/spacing'
+import spacing from '../../../styles/spacing'
 
 export default function Container ({ children, max }) {
   return (
