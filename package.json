@@ -10,7 +10,9 @@
     "lint": "eslint ./",
     "now-build": "APP_URL=${NOW_URL}/ next build",
     "now-start": "APP_URL=${NOW_URL}/ NODE_ENV=production node server.js",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test jest",
+    "test:coverage": "yarn test --coverage",
+    "test:badges": "yarn test:coverage  && jest-coverage-badges"
   },
   "author": "Nick VanMeter",
   "license": "ISC",
@@ -55,6 +57,7 @@
     "eslint-plugin-react": "^7.6.1",
     "eslint-plugin-standard": "^4.0.0",
     "jest": "^23.6.0",
+    "jest-coverage-badges": "^1.0.0",
     "node-sass": "^4.7.2",
     "nodemon": "^1.14.12",
     "react-test-renderer": "^16.5.2",

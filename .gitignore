@@ -14,4 +14,8 @@ dist
 .env
 yarn-error.log
 
-coverage
+coverage/lcov-report
+coverage/clover.xml
+coverage/coverage-summary.json
+coverage/coverage-final.json
+coverage/lcov.info

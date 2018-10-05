@@ -16,4 +16,9 @@ module.exports = {
     '<rootDir>/server/**/*.{js,jsx}',
     '<rootDir>/utils/**/*.{js,jsx}',
   ],
+  coverageReporters: [
+    'json-summary',
+    'text',
+    'lcov',
+  ],
 }

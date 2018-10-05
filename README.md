@@ -1,5 +1,17 @@
 # Fitbit Runner's Dashboard
 View your Fitbit health and running activity history based on a selected date range
+
+### Build status
+[![CircleCI](https://circleci.com/gh/nickjvm/fitbit-dashboard.svg?style=svg)](https://circleci.com/gh/nickjvm/fitbit-dashboard)
+
+### Coverage reports
+|            |                                                        |
+| ---------- | ------------------------------------------------------ |
+| Branches   | ![CoverageBranches](./coverage/badge-branches.svg)     |
+| Functions  | ![CoverageFunctions](./coverage/badge-functions.svg)   |
+| Lines      | ![CoverageLines](./coverage/badge-lines.svg)           |
+| Statements | ![CoverageStatements](./coverage/badge-statements.svg) |
+
 ![Screenshot](static/images/screenshot-lg.png)
 This has been tested with data logged using a Fitbit Charge 2. Other devices may or may not work depending on the data collected. PRs are welcomed if you notice an issue with your device!
 
