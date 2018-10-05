@@ -1,0 +1,103 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Clickable renders children 1`] = `
+ShallowWrapper {
+  Symbol(enzyme.__root__): [Circular],
+  Symbol(enzyme.__unrendered__): <Clickable>
+    this is a test
+  </Clickable>,
+  Symbol(enzyme.__renderer__): Object {
+    "batchedUpdates": [Function],
+    "getNode": [Function],
+    "render": [Function],
+    "simulateError": [Function],
+    "simulateEvent": [Function],
+    "unmount": [Function],
+  },
+  Symbol(enzyme.__node__): Object {
+    "instance": null,
+    "key": undefined,
+    "nodeType": "host",
+    "props": Object {
+      "children": Array [
+        "this is a test",
+        <JSXStyle
+          css="a.jsx-1068520229{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}"
+          styleId="1068520229"
+        />,
+      ],
+      "className": "jsx-1068520229 ",
+    },
+    "ref": null,
+    "rendered": Array [
+      "this is a test",
+      Object {
+        "instance": null,
+        "key": undefined,
+        "nodeType": "class",
+        "props": Object {
+          "css": "a.jsx-1068520229{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}",
+          "styleId": "1068520229",
+        },
+        "ref": null,
+        "rendered": null,
+        "type": [Function],
+      },
+    ],
+    "type": "a",
+  },
+  Symbol(enzyme.__nodes__): Array [
+    Object {
+      "instance": null,
+      "key": undefined,
+      "nodeType": "host",
+      "props": Object {
+        "children": Array [
+          "this is a test",
+          <JSXStyle
+            css="a.jsx-1068520229{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}"
+            styleId="1068520229"
+          />,
+        ],
+        "className": "jsx-1068520229 ",
+      },
+      "ref": null,
+      "rendered": Array [
+        "this is a test",
+        Object {
+          "instance": null,
+          "key": undefined,
+          "nodeType": "class",
+          "props": Object {
+            "css": "a.jsx-1068520229{display:inline-block;padding:12px 24px;background:#46cba0;border-bottom:3px solid hsl(160.60000000000002, 56.1%, 40.1%);text-decoration:none;text-transform:uppercase;border-radius:3px;color:#FFFFFF;font-weight:bold;-webkit-font-smoothing:antialiased;}",
+            "styleId": "1068520229",
+          },
+          "ref": null,
+          "rendered": null,
+          "type": [Function],
+        },
+      ],
+      "type": "a",
+    },
+  ],
+  Symbol(enzyme.__options__): Object {
+    "adapter": ReactSixteenAdapter {
+      "options": Object {
+        "enableComponentDidUpdateOnSetState": true,
+        "lifecycles": Object {
+          "componentDidUpdate": Object {
+            "onSetState": true,
+          },
+          "getDerivedStateFromProps": true,
+          "getSnapshotBeforeUpdate": true,
+          "setState": Object {
+            "skipsComponentDidUpdateOnNullish": true,
+          },
+        },
+      },
+    },
+    "attachTo": undefined,
+    "hydrateIn": undefined,
+  },
+}
+`;
